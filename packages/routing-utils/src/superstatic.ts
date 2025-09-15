@@ -414,12 +414,19 @@ function replaceSegments(
   hostname = hostname ? safelyCompile(hostname, indexes, true) : null;
 
   for (const [key, strOrArray] of Object.entries(query)) {
+    if (strOrArray === undefined) {
+      // If the query param is explicitly undefined, ensure we don't pass it to
+      // the compiler since `safelyCompile` expects a string. Omitting the key
+      // or providing an empty string prevents runtime errors when generating
+      // the redirect URL.
+      query[key] = '';
+      continue;
+    }
     if (Array.isArray(strOrArray)) {
       query[key] = strOrArray.map(str =>
         safelyCompile(unescapeSegments(str), indexes, true)
       );
     } else {
-      // TODO: handle strOrArray is undefined
       query[key] = safelyCompile(
         unescapeSegments(strOrArray as string),
         indexes,

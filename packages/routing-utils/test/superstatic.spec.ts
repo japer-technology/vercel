@@ -1,4 +1,4 @@
-import { deepEqual } from 'assert';
+import { deepEqual, doesNotThrow } from 'assert';
 import { Route, RouteWithSrc, normalizeRoutes } from '../src';
 import {
   getCleanUrls,
@@ -8,6 +8,7 @@ import {
   convertHeaders,
   convertTrailingSlash,
 } from '../src/superstatic';
+import { format as formatUrl } from 'url';
 
 function routesToRegExps(routeArray: Route[]) {
   const { routes, error } = normalizeRoutes(routeArray);
@@ -504,6 +505,15 @@ test('convertRedirects', () => {
   ];
 
   assertRegexMatches(actual, mustMatch, mustNotMatch);
+});
+
+test('convertRedirects handles undefined query params', () => {
+  const destination = formatUrl({
+    pathname: '/to',
+    query: { foo: undefined },
+  });
+
+  doesNotThrow(() => convertRedirects([{ source: '/from', destination }]));
 });
 
 test('convertRewrites', () => {
