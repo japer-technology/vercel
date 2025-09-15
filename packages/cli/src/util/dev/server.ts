@@ -98,6 +98,7 @@ import {
 import isURL from './is-url';
 import { pickOverrides } from '../projects/project-settings';
 import { replaceLocalhost } from './parse-listen';
+import getRequestIpFromHeaders from './get-request-ip';
 
 const frontendRuntimeSet = new Set(
   frameworkList.map(f => f.useRuntime?.use || '@vercel/static-build')
@@ -1156,8 +1157,7 @@ export default class DevServer {
   }
 
   getRequestIp(req: http.IncomingMessage): string {
-    // TODO: respect the `x-forwarded-for` headers
-    return req.connection.remoteAddress || '127.0.0.1';
+    return getRequestIpFromHeaders(req);
   }
 
   /**
